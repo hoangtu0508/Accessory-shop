@@ -20,7 +20,6 @@ const Product = (props) => {
 
     const product = props.product
 
-    console.log(product);
     const price = product?.attributes?.productPrice
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -29,8 +28,6 @@ const Product = (props) => {
         const userId = user?.user.id
         setUserId(userId)
     }, [])
-
-    console.log(userId);
 
     const dispatch = useDispatch();
     const quantity = useSelector((state) => state.product[product.id]?.quantity || 1);
@@ -50,8 +47,6 @@ const Product = (props) => {
             toast.info("Please log in to add products to cart!");
         }
     }
-
-    console.log(product);
 
     return (
         <div>

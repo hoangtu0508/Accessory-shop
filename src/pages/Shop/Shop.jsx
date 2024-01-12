@@ -9,19 +9,38 @@ import { getProduct } from '../../features/product/productSlice';
 import { getCollections } from '../../features/collection/collectionSlice';
 import { getAllCategory } from '../../features/category/categorySlice';
 import { getPriceEth } from '../../features/currencyConverter/currencyConverterSlice';
+import { GrNext, GrPrevious } from 'react-icons/gr';
 
 const Shop = () => {
     const [priceRange, setPriceRange] = useState([50, 300])
     const [isOpenPrice, setOpenPrice] = useState(false)
     const [isOpenSort, setOpenSort] = useState(false)
     const [selectedOption, setSelectedOption] = useState('');
+    const [dataProduct, setDataProduct] = useState()
+    const [itemsPerPage, setItemsPerPage] = useState(9)
+    const [currentPage, setCurrentPage] = useState(1);
 
     const products = useSelector((state) => state?.product?.products?.data);
     const collections = useSelector((state) => state?.collection?.collection?.data);
     const categories = useSelector((state) => state?.category?.category?.data);
     const dispatch = useDispatch()
 
-    console.log(products);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = dataProduct?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(dataProduct?.length / itemsPerPage);
+
+    console.log(currentItems);
+
+    useEffect(() => {
+        if (Array.isArray(products)) {
+            const sortedOrders = products.slice().sort((a, b) => b.id - a.id);
+            setDataProduct(sortedOrders)
+        } else {
+            console.error("orderState không phải là một mảng hoặc không tồn tại.");
+        }
+    }, [products])
 
     useEffect(() => {
         dispatch(getProduct())
@@ -50,6 +69,20 @@ const Shop = () => {
         setOpenSort(false);
     };
 
+    const prev = () => {
+        if (currentPage === 1) {
+        } else {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const next = () => {
+        if (currentPage === totalPages) {
+        } else {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
     return (
         <div className='py-16 w-10/12 m-auto'>
             <div className='text-center mt-10'>
@@ -59,7 +92,7 @@ const Shop = () => {
             <div className='grid grid-cols-4 gap-12 mt-10'>
                 <div className=''>
                     <h3 className='text-xl font-medium'>FILTER YOUR SEARCH</h3>
-                    <h4>345 Products</h4>
+                    <h4>{products?.length} Products</h4>
                 </div>
                 <div>
                     <h3 className='text-lg font-medium'>Search</h3>
@@ -136,7 +169,7 @@ const Shop = () => {
                         </ul>
                     </div>
 
-                    <div className='mt-6'>
+                    {/* <div className='mt-6'>
                         <div className='border-b border-text py-2'>
                             <h3 className='text-lg font-medium '>Colors</h3>
                         </div>
@@ -179,9 +212,9 @@ const Shop = () => {
                             </li>
 
                         </ul>
-                    </div>
+                    </div> */}
 
-                    <div className='mt-6'>
+                    {/* <div className='mt-6'>
                         <div className='border-b border-text py-2'>
                             <h3 className='text-lg font-medium '>Size</h3>
                         </div>
@@ -208,7 +241,7 @@ const Shop = () => {
                                 </span>
                             </li>
                         </ul>
-                    </div>
+                    </div> */}
 
                     <div className='mt-6'>
                         <div className='border-b border-text py-2'>
@@ -246,12 +279,51 @@ const Shop = () => {
                 <div className='w-3/4'>
                     <div className='grid grid-cols-3 gap-12'>
                         {
-                            products?.map((product) => (
+                            currentItems?.map((product) => (
                                 <Product product={product} />
                             ))
                         }
                     </div>
 
+                </div>
+            </div>
+
+            <div className='flex justify-between p-4 mt-4 bg-white'>
+                <div className="flex">
+                    <h4>Show</h4>
+                    <input
+                        type="number"
+                        min={10}
+                        max={products?.length}
+                        value={itemsPerPage}
+                        onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+                        className='border border-gray-500 rounded-sm px-2 w-12 mx-2 font-medium text-orange-600'
+                    />
+                    <h4>order page</h4>
+                </div>
+
+                <div className='flex items-center'>
+                    <div className='icon'
+                        onClick={() => prev()}>
+                        <GrPrevious className='icon-prev' />
+                    </div>
+                    <div className="page-number">
+                        <span className='mx-2'>1</span>
+                        <input
+                            type="number"
+                            min="1"
+                            max={totalPages}
+                            value={currentPage}
+                            onChange={(e) => setCurrentPage(parseInt(e.target.value))}
+                            className='w-12 border border-gray-500 rounded-sm px-2 text-orange-600 mx-2 font-medium'
+                        />
+                        <span className='mx-2'>{totalPages}</span>
+                    </div>
+                    <div className='icon' onClick={() => next()}><GrNext className='icon-next' /></div>
+
+                    <div className="ml-4">
+                        <h4>Total: <span className='font-medium text-orange-600'>{products?.length}</span> Orders</h4>
+                    </div>
                 </div>
             </div>
         </div>

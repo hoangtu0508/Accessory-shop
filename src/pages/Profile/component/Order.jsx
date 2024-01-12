@@ -25,8 +25,6 @@ const Order = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = orders?.slice(indexOfFirstItem, indexOfLastItem);
 
-    console.log(showReview);
-
     const totalPages = Math.ceil(orders?.length / itemsPerPage);
 
     useEffect(() => {
